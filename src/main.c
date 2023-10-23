@@ -9,8 +9,8 @@
 #include <linux/spi/spi.h>
 
 #include "drm_iface.h"
-#include "params_iface.h"
 #include "ioctl_iface.h"
+#include "params_iface.h"
 
 static int sharp_memory_probe(struct spi_device *spi)
 {
@@ -47,10 +47,24 @@ static void sharp_memory_shutdown(struct spi_device *spi)
 	sharp_memory_remove(spi);
 }
 
+static const struct spi_device_id sharp_drm_spi_id[] = {
+	{"sharp-drm", 0},
+	{},
+};
+MODULE_DEVICE_TABLE(spi, sharp_drm_spi_id);
+
+static const struct of_device_id sharp_drm_spi_of_match[] = {
+	{.compatible = "sharp-drm"},
+	{},
+};
+MODULE_DEVICE_TABLE(of, sharp_drm_spi_of_match);
+
 static struct spi_driver sharp_memory_spi_driver = {
 	.driver = {
 		.name = "sharp-drm",
+		.of_match_table = of_match_ptr(sharp_drm_spi_of_match),
 	},
+	.id_table = sharp_drm_spi_id,
 	.probe = sharp_memory_probe,
 	.remove = sharp_memory_remove,
 	.shutdown = sharp_memory_shutdown,
